@@ -49,7 +49,7 @@ if kdialog --yesno "Launch a Test Install using Virtual Box?"; then
     # Use VirtualBox to launch a VM booting from the ISO image
     VBoxManage createvm --name "TestKubuntuInstall" --register
     VBoxManage modifyvm "TestKubuntuInstall" --memory 2048 --acpi on --boot1 dvd --nic1 nat
-    VBoxManage createhd --filename "$HOME/VirtualBox VMs/TestKubuntuInstall/TestKubuntuInstall.vdi" --size 8000
+    VBoxManage createhd --filename "$HOME/VirtualBox VMs/TestKubuntuInstall/TestKubuntuInstall.vdi" --size 12000
     VBoxManage storagectl "TestKubuntuInstall" --name "IDE Controller" --add ide
     VBoxManage storageattach "TestKubuntuInstall" --storagectl "IDE Controller" --port 0 --device 0 --type hdd --medium "$HOME/VirtualBox VMs/TestKubuntuInstall/TestKubuntuInstall.vdi"
     VBoxManage storageattach "TestKubuntuInstall" --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium "$isoFilePath"
