@@ -29,7 +29,7 @@ check_and_install_tool() {
 }
 
 # Function to check for a previous Kubuntu Test VM
-check_existing(){
+check_existing_vm(){
 
 # Run VBoxManage list vms and capture output
 vms_output=$(VBoxManage list vms)
