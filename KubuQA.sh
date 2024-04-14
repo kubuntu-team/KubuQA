@@ -20,6 +20,23 @@ VM_NAME="TestKubuntuInstall"
 # Default: "$HOME/VirtualBox VMs/$VM_NAME/$VM_NAME.vdi"
 VDI_FILEPATH="$HOME/VirtualBox VMs/$VM_NAME/$VM_NAME.vdi"
 
+# Number of virtual CPUs to assign to the VM.
+# You should not configure virtual machines to use more CPU cores than are available physically.
+# Rule of thumb: Assign about 1/4-1/2 of your physical cores,
+# depending on what you are doing on the host system aside from running the VM.
+# Default: 2
+VM_CPU_CORES="2"
+
+# The amount of host system RAM to allocate to the VM (in MB).
+# The more, the better for the VM, but keep in mind what you are doing on the host system aside from running the VM.
+# Default: 2048 (aka 2 GB)
+VM_RAM="2048"
+
+# Wheter to enable paravirtualization via KVM. This leads to better performance on devices that support it.
+# Possible values: "kvm" (to enable), "none" (to diable)
+# Default: "none"
+PARAVIRT="none"
+
 
 #############################################
 # DO NOT EDIT ANY VARIABLES BELOW THIS LINE #
@@ -68,7 +85,7 @@ check_existing_vm(){
     # There was no VM or the user chose to remove it
     VBoxManage createvm --name "$VM_NAME" --register
     # Set up the newly created VM
-    VBoxManage modifyvm "$VM_NAME" --memory 2048 --acpi on --nic1 nat
+    VBoxManage modifyvm "$VM_NAME" --os-type="Ubuntu_64" --acpi on --nic1 nat --cpus="$VM_CPU_CORES" --memory="$VM_RAM" --paravirt-provider="$PARAVIRT"
     # Create storage controllers for the ISO and VDI
     VBoxManage storagectl "$VM_NAME" --name "SATA Controller" --add sata --bootable=on
     VBoxManage storagectl "$VM_NAME" --name "IDE Controller" --add ide --bootable=on
