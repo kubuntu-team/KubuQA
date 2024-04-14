@@ -28,7 +28,7 @@ check_and_install_tool() {
     fi
 }
 
-# Function to check for a previous Kubuntu Test VM
+# Function to check for a previous Kubuntu Test VM. If not found, create one.
 check_existing_vm(){
     # Run VBoxManage list vms and capture output
     vms_output=$(VBoxManage list vms)
@@ -41,12 +41,17 @@ check_existing_vm(){
         if [ $? -eq 0 ]; then
             # User chose to keep the VM
             echo "Keeping 'TestKubuntuInstall' VM."
+            return
         else
             # User chose to remove the VM
             VBoxManage unregistervm "$vm_id" --delete
             echo "'TestKubuntuInstall' VM has been removed."
         fi
     fi
+    # There was no VM or the user chose to remove it
+    VBoxManage createvm --name "TestKubuntuInstall" --register
+    echo "A new 'TestKubuntuInstall' VM has been created."
+}
 
     # Check for existing Hard Drive
     if [ -f "$vdi_file" ]; then
