@@ -23,7 +23,7 @@ In order to execute this script, the following tools need to be installed on you
 - `kdialog` for graphical dialogs.
 - `zsync` for ISO file updates.
 - `wget` for downloading files.
-- `VirtualBox` for running the test installation.
+- `VirtualBox` and `VBoxManage` for running the test installation.
 
 The script includes a preliminary check and attempts to install any missing tools using `pkexec`.
 You will be asked to authorize each installation with the root password.
