@@ -53,7 +53,8 @@ check_existing_vm(){
 
 # Function to check for existing Virtual Disk Image. If not found, create one.
 function check_existing_vdi() {
-    if [ -f "$vdi_file" ]; then
+    # Check if there is already a registered VDI in VirtualBox
+    if VBoxManage list hdds | grep --quiet "TestKubuntuInstall"; then
         if kdialog --yesno "Existing Virtual Disk Image (VDI) found. Keep it?"; then
             echo "User chose to keep the existing VDI file."
             return
