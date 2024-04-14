@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# This script automates downloading the latest daily ISO for Kubuntu and spinning up a VM in VirtualBox.
+# It uses VBoxManage to set up the VM, look here for documentation: https://www.virtualbox.org/manual/ch08.html
+
 # CONFIGURATION
 # -------------
 
