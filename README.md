@@ -82,9 +82,11 @@ Be prepared to authenticate as necessary.
 If you have ideas for additions or improvements please do create an Issue,
 or open a Pull Request on our [Github KubuQA](https://github.com/kubuntu-team/KubuQA).
 
-### Ideas
+### Ideas (so far)
 
-- [ ] adsf
+- [ ] Introductory dialog that gives an overview of what is about to happen
+- [ ] Implement various variables to make the script more configurable and accessible
+- [ ] Provide an "Uninstall" option
 
 ## License
 
