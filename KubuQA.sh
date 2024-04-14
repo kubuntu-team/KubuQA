@@ -48,6 +48,9 @@ check_existing_vm(){
     fi
     # There was no VM or the user chose to remove it
     VBoxManage createvm --name "TestKubuntuInstall" --register
+    # Create storage controllers for the ISO and VDI
+    VBoxManage storagectl "TestKubuntuInstall" --name "SATA Controller" --add sata --bootable=on
+    VBoxManage storagectl "TestKubuntuInstall" --name "IDE Controller" --add ide --bootable=on
     echo "A new 'TestKubuntuInstall' VM has been created."
 }
 
@@ -117,7 +120,7 @@ if kdialog --yesno "Launch a Test Install using Virtual Box?"; then
         *) echo "Invalid choice"; exit 1 ;;
     esac
 
-    VBoxManage storagectl "TestKubuntuInstall" --name "IDE Controller" --add ide
+
     VBoxManage storageattach "TestKubuntuInstall" --storagectl "IDE Controller" --port 0 --device 0 --type hdd --medium "$vdi_file"
 
     # Spin it up, we are Go For Launch!!
