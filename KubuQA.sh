@@ -36,9 +36,7 @@ check_existing_vm(){
     vm_id=$(echo "$vms_output" | grep "\"TestKubuntuInstall\"" | awk '{print $2}' | tr -d '{}')
     if [ -n "$vm_id" ]; then
         # Prompt the user with kdialog
-        response=$(kdialog --title "VM Exists" --yesno "The 'TestKubuntuInstall' VM exists (ID: $vm_id). Do you want to keep it?")
-        # Check the user's decision from kdialog's return status
-        if [ $? -eq 0 ]; then
+        if kdialog --title "VM Exists" --yesno "The 'TestKubuntuInstall' VM exists (ID: $vm_id). Do you want to keep it?"; then
             # User chose to keep the VM
             echo "Keeping 'TestKubuntuInstall' VM."
             return
