@@ -67,6 +67,28 @@ function check_existing_vdi() {
     VBoxManage createmedium disk --filename "$vdi_file" --size 12000 --format=VDI
 }
 
+function check_existing_iso() {
+    # Ensure the ISO Download directory exists
+    mkdir -p "$directory"
+    cd "$directory"
+    # Check if the ISO file exists, and has already been downloaded
+    if [ -f "$isoFileName" ]; then
+        # Prompt the user to check for updates
+        if kdialog --yesno "I found an ISO Test Image, would you like to check for updates?"; then
+            # Use zsync to update the ISO
+            zsync "http://$isoDownloadURL.zsync"
+        fi
+    else
+        # Prompt the user to download the ISO if it doesn't exist
+        if kdialog --yesno "No local test ISO image available, should I download one?"; then
+            # Download the ISO
+            wget "https://$isoDownloadURL"
+        else
+            exit
+        fi
+    fi
+}
+
 # MAIN
 # ----
 
@@ -79,27 +101,7 @@ check_and_install_tool VBoxManage virtualbox
 # Check whether various components exist. If not or if requested, (re)create them
 check_existing_vm
 check_existing_vdi
-
-# Ensure the ISO Download directory exists
-mkdir -p "$directory"
-cd "$directory"
-
-# Check if the ISO file exists, and has already been downloaded
-if [ -f "$isoFileName" ]; then
-    # Prompt the user to check for updates
-    if kdialog --yesno "I found an ISO Test Image, would you like to check for updates?"; then
-        # Use zsync to update the ISO
-        zsync "http://$isoDownloadURL.zsync"
-    fi
-else
-    # Prompt the user to download the ISO if it doesn't exist
-    if kdialog --yesno "No local test ISO image available, should I download one?"; then
-        # Download the ISO
-        wget "https://$isoDownloadURL"
-    else
-        exit
-    fi
-fi
+check_existing_iso
 
 # Prompt the user to launch a test install using VirtualBox
 if kdialog --yesno "Launch a Test Install using Virtual Box?"; then
