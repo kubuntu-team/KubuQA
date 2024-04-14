@@ -61,14 +61,17 @@ To run the script, simply execute it from the terminal:
 
 The script will guide you through the following steps:
 
-- Checking for a KubuntuTestISO directory in your Downloads folder and creating it if necessary.
-- Checking if the `noble-desktop-amd64.iso` file exists within the directory:
+- Install all necessary programs it needs to run (see above)
+- Set up the scaffold of the testing VM if necessary
+- Create a Virtual Disk Image (VDI) if necessary
+- Look for a KubuntuTestISO directory in your Downloads directory and create it if necessary
+- Check if the `noble-desktop-amd64.iso` file exists within this directory:
   - If found, it offers to check for updates using zsync.
   - If not found, it prompts to download the ISO.
-- Asking if you want to launch a test installation in VirtualBox.
+- Ask if you want to launch a test installation in VirtualBox.
 If you choose Yes, it configures and starts a new VirtualBox VM using the ISO.
 Please **make sure to select `ISO`** when starting up a freshly created VM,
-since the HDD is empty and can't be used as boot device as long as there is no OS installed on it.
+since the VDI is empty and can't be used as boot device as long as there is no OS installed on it.
 
 Upon subsequent runs, you may choose to boot from ISO or VDI, giving you the ability to Stop/Start your testing as desired.
 
