@@ -110,7 +110,7 @@ check_existing_iso
 if kdialog --yesno "Launch a Test Install using Virtual Box?"; then
 
     # Enable the user to choose which device to boot from
-    choice=$(kdialog --menu "Select boot medium" 1 "ISO" 2 "HDD")
+    choice=$(kdialog --menu "Select boot medium" 1 "ISO" 2 "VDI")
 
     case "$choice" in
            # Connect the ISO to its storage controller and make VirtualBox boot from it
