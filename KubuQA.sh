@@ -51,6 +51,8 @@ check_existing_vm(){
     fi
     # There was no VM or the user chose to remove it
     VBoxManage createvm --name "TestKubuntuInstall" --register
+    # Set up the newly created VM
+    VBoxManage modifyvm "TestKubuntuInstall" --memory 2048 --acpi on --nic1 nat
     # Create storage controllers for the ISO and VDI
     VBoxManage storagectl "TestKubuntuInstall" --name "SATA Controller" --add sata --bootable=on
     VBoxManage storagectl "TestKubuntuInstall" --name "IDE Controller" --add ide --bootable=on
@@ -116,11 +118,11 @@ if kdialog --yesno "Launch a Test Install using Virtual Box?"; then
     choice=$(kdialog --menu "Select boot medium" 1 "ISO" 2 "VDI")
 
     case "$choice" in
-           # Connect the ISO to its storage controller and make VirtualBox boot from it
-        1) VBoxManage modifyvm "TestKubuntuInstall" --memory 2048 --acpi on --boot1 dvd --nic1 nat
+           # Attatch the ISO to its storage controller and make VirtualBox boot from it
+        1) VBoxManage modifyvm "TestKubuntuInstall" --boot1 dvd
            VBoxManage storageattach "TestKubuntuInstall" --storagectl "IDE Controller" --port 0 --device 0 --type dvddrive --medium "$isoFilePath" ;;
            # Make VirtualBox boot from the VDI
-        2) VBoxManage modifyvm "TestKubuntuInstall" --memory 2048 --acpi on --boot1 disk --nic1 nat ;;
+        2) VBoxManage modifyvm "TestKubuntuInstall" --boot1 disk ;;
         *) echo "Invalid choice"; exit 1 ;;
     esac
 
