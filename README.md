@@ -1,22 +1,21 @@
 # KubuQA
 
-## Kubuntu ISO Testing Utility
+## Kubuntu ISO Testing Utility - Spin up VMs with ease
 
 **New to Kubuntu Testing & Development ?** No worries, we have you covered!!
-
-We assume you're working on Kubuntu, or another Ubuntu based Linux distribution.
 
 ### Overview
 
 This Bash script automates the process of setting up a test environment based off the latest daily build of Kubuntu.
-It checks for the existence of a Kubuntu daily build ISO file, manages ISO downloads and updates,
-and facilitates launching a test installation using VirtualBox.
+It downloads all required files if necessary and facilitates launching a test installation using VirtualBox.
 It leverages `kdialog` for graphical user interaction,
-making it accessible even for users who prefer not to work directly with the command line.
+making it accessible even for users who prefer not to work with the command line directly.
 
 ## Installation
 
 ### Prerequisites
+
+We assume you're working on Kubuntu, or another Ubuntu based Linux distribution.
 
 In order to execute this script, the following tools need to be installed on your system:
 
@@ -34,13 +33,13 @@ script to assure yourself of what is being installed._
 
 Clone this repository or download the script directly from the GitHub page:
 
-**Clone**
+#### Clone
 
 ```bash
 git clone git@github.com:kubuntu-team/KubuQA.git
-````
+```
 
-**Download**
+#### Download
 
 ```bash
 wget -O KubuQA.sh https://raw.githubusercontent.com/kubuntu-team/KubuQA/main/KubuQA.sh 
@@ -62,23 +61,31 @@ To run the script, simply execute it from the terminal:
 
 The script will guide you through the following steps:
 
-- Checking for the KubuntuTestISO directory in your Downloads folder and creating it if necessary.
-- Checking for the noble-desktop-amd64.iso file within the directory:
+- Checking for a KubuntuTestISO directory in your Downloads folder and creating it if necessary.
+- Checking if the `noble-desktop-amd64.iso` file exists within the directory:
   - If found, it offers to check for updates using zsync.
   - If not found, it prompts to download the ISO.
-- After handling the ISO file, it asks if you want to launch a test installation in VirtualBox:
-- If you choose Yes, it configures and starts a new VirtualBox VM using the ISO.
+- Asking if you want to launch a test installation in VirtualBox.
+If you choose Yes, it configures and starts a new VirtualBox VM using the ISO.
+Please **make sure to select `ISO`** when starting up a freshly created VM,
+since the HDD is empty and can't be used as boot device as long as there is no OS installed on it.
 
-Upon subsequent runs, it provides the option to boot from ISO or VDI, giving you the ability to Stop/Start your testing as required
+Upon subsequent runs, you may choose to boot from ISO or VDI, giving you the ability to Stop/Start your testing as desired.
 
 For each of the steps that require user interaction, a `kdialog` prompt will appear to guide you through the process.
 
-Note: Running the script and the installations it performs, may require root privileges.
+_Note:_ Running the script and the installations it performs, may require root privileges.
 Be prepared to authenticate as necessary.
 
-## Issues or Improvements
+## Contributing
 
 If you have ideas for additions or improvements please do create an Issue,
-or open a Pull Request on our [Github KubuQA](https://github.com/kubuntu-team/KubuQA)
+or open a Pull Request on our [Github KubuQA](https://github.com/kubuntu-team/KubuQA).
+
+### Ideas
+
+- [ ] adsf
+
+## License
 
 [License GPL v3.0](./License)
