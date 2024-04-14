@@ -108,8 +108,6 @@ check_existing_iso
 
 # Prompt the user to launch a test install using VirtualBox
 if kdialog --yesno "Launch a Test Install using Virtual Box?"; then
-    # Use VirtualBox to launch a VM booting from the ISO image
-    VBoxManage createvm --name "TestKubuntuInstall" --register
 
     # Enable the user to choose which device to boot from
     choice=$(kdialog --menu "Select boot medium" 1 "ISO" 2 "HDD")
