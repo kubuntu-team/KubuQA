@@ -113,13 +113,16 @@ if kdialog --yesno "Launch a Test Install using Virtual Box?"; then
     choice=$(kdialog --menu "Select boot medium" 1 "ISO" 2 "HDD")
 
     case "$choice" in
-        1) VBoxManage modifyvm "TestKubuntuInstall" --memory 2048 --acpi on --boot1 dvd --nic1 nat ;;
+           # Connect the ISO to its storage controller and make VirtualBox boot from it
+        1) VBoxManage modifyvm "TestKubuntuInstall" --memory 2048 --acpi on --boot1 dvd --nic1 nat
+           VBoxManage storageattach "TestKubuntuInstall" --storagectl "IDE Controller" --port 0 --device 0 --type dvddrive --medium "$isoFilePath" ;;
+           # Make VirtualBox boot from the VDI
         2) VBoxManage modifyvm "TestKubuntuInstall" --memory 2048 --acpi on --boot1 disk --nic1 nat ;;
         *) echo "Invalid choice"; exit 1 ;;
     esac
 
-
-    VBoxManage storageattach "TestKubuntuInstall" --storagectl "IDE Controller" --port 0 --device 0 --type hdd --medium "$vdi_file"
+    # Connect the VDI to its storage controller
+    VBoxManage storageattach "TestKubuntuInstall" --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium "$vdi_file"
 
     # Spin it up, we are Go For Launch!!
     VBoxManage startvm "TestKubuntuInstall"
