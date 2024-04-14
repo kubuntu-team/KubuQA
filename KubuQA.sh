@@ -7,15 +7,16 @@
 # -------------
 
 # Define the directory and file names
-directory="$HOME/Downloads/KubuntuTestISO"
-isoFileName="noble-desktop-amd64.iso"
-isoFilePath="$directory/$isoFileName"
-vdi_file="$HOME/VirtualBox VMs/TestKubuntuInstall/TestKubuntuInstall.vdi"
+DIRECTORY="$HOME/Downloads/KubuntuTestISO"
+ISO_FILENAME="noble-desktop-amd64.iso"
+ISO_FILEPATH="$DIRECTORY/$ISO_FILENAME"
+VDI_FILENAME="TestKubuntuInstall.vdi"
+VDI_FILEPATH="$HOME/VirtualBox VMs/TestKubuntuInstall/$VDI_FILENAME"
 
 # Don't include the protocol http:// || https:// as we need to switch between them
 # to enable zsync to be succesful. See:
 # https://ubuntuforums.org/showthread.php?t=2494264
-isoDownloadURL="cdimages.ubuntu.com/kubuntu/daily-live/current/$isoFileName"
+ISO_DOWNLOAD_URL="cdimages.ubuntu.com/kubuntu/daily-live/current/$ISO_FILENAME"
 
 # FUNCTIONS
 # ---------
@@ -68,29 +69,29 @@ function check_existing_vdi() {
             return
         else
             echo "Deleting the existing VDI file..."
-            VBoxManage closemedium disk "$vdi_file" --delete
+            VBoxManage closemedium disk "$VDI_FILEPATH" --delete
         fi
     fi
     echo "No Virtual Disk Image found. Creating a new one..."
-    VBoxManage createmedium disk --filename "$vdi_file" --size 12000 --format=VDI
+    VBoxManage createmedium disk --filename "$VDI_FILEPATH" --size 12000 --format=VDI
 }
 
 function check_existing_iso() {
     # Ensure the ISO Download directory exists
-    mkdir -p "$directory"
-    cd "$directory"
+    mkdir -p "$DIRECTORY"
+    cd "$DIRECTORY"
     # Check if the ISO file exists, and has already been downloaded
-    if [ -f "$isoFileName" ]; then
+    if [ -f "$ISO_FILENAME" ]; then
         # Prompt the user to check for updates
         if kdialog --yesno "I found an ISO Test Image, would you like to check for updates?"; then
             # Use zsync to update the ISO
-            zsync "http://$isoDownloadURL.zsync"
+            zsync "http://$ISO_DOWNLOAD_URL.zsync"
         fi
     else
         # Prompt the user to download the ISO if it doesn't exist
         if kdialog --yesno "No local test ISO image available, should I download one?"; then
             # Download the ISO
-            wget "https://$isoDownloadURL"
+            wget "https://$ISO_DOWNLOAD_URL"
         else
             exit
         fi
@@ -120,14 +121,14 @@ if kdialog --yesno "Launch a Test Install using Virtual Box?"; then
     case "$choice" in
            # Attatch the ISO to its storage controller and make VirtualBox boot from it
         1) VBoxManage modifyvm "TestKubuntuInstall" --boot1 dvd
-           VBoxManage storageattach "TestKubuntuInstall" --storagectl "IDE Controller" --port 0 --device 0 --type dvddrive --medium "$isoFilePath" ;;
+           VBoxManage storageattach "TestKubuntuInstall" --storagectl "IDE Controller" --port 0 --device 0 --type dvddrive --medium "$ISO_FILEPATH" ;;
            # Make VirtualBox boot from the VDI
         2) VBoxManage modifyvm "TestKubuntuInstall" --boot1 disk ;;
         *) echo "Invalid choice"; exit 1 ;;
     esac
 
     # Connect the VDI to its storage controller
-    VBoxManage storageattach "TestKubuntuInstall" --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium "$vdi_file"
+    VBoxManage storageattach "TestKubuntuInstall" --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium "$VDI_FILEPATH"
 
     # Spin it up, we are Go For Launch!!
     VBoxManage startvm "TestKubuntuInstall"
