@@ -51,20 +51,19 @@ check_existing_vm(){
     echo "A new 'TestKubuntuInstall' VM has been created."
 }
 
-    # Check for existing Hard Drive
+# Function to check for existing Virtual Disk Image. If not found, create one.
+function check_existing_vdi() {
     if [ -f "$vdi_file" ]; then
-        if kdialog --yesno "Existing HDD disk-drive found. Keep it?"; then
-            echo "User chose to keep the existing file."
+        if kdialog --yesno "Existing Virtual Disk Image (VDI) found. Keep it?"; then
+            echo "User chose to keep the existing VDI file."
+            return
         else
             echo "Deleting the existing VDI file..."
             rm "$vdi_file"
         fi
-    else
-        echo "VDI file doesn't exist. Creating a new one..."
-        VBoxManage createhd --filename "$vdi_file" --size 12000
-    fielse
-        echo "'TestKubuntuInstall' VM does not exist. Initialising..."
     fi
+    echo "No Virtual Disk Image found. Creating a new one..."
+    VBoxManage createhd --filename "$vdi_file" --size 12000
 }
 
 # MAIN
@@ -76,8 +75,9 @@ check_and_install_tool zsync zsync
 check_and_install_tool wget wget
 check_and_install_tool VBoxManage virtualbox
 
-# Check if an TestKubuntuInstall VM exists
+# Check whether various components exist. If not or if requested, (re)create them
 check_existing_vm
+check_existing_vdi
 
 # Ensure the ISO Download directory exists
 mkdir -p "$directory"
