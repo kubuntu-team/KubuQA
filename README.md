@@ -6,18 +6,6 @@
 
 We assume you're working on Kubuntu, or another Ubuntu based Linux distribution.
 
-**Step 1**
-
-Open a terminal application such as Konsole, or Xterm
-
-**Step 2**
-
-Copy and paste the following line into the terminal window at the command line.
-
-```shell
-wget -O KubuQA.sh https://raw.githubusercontent.com/kubuntu-team/KubuQA/main/KubuQA.sh && bash KubuQA.sh
-```
-
 ### Overview
 
 This Bash script automates the process of setting up a test environment based off the latest daily build of Kubuntu.
