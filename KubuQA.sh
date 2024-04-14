@@ -59,11 +59,11 @@ function check_existing_vdi() {
             return
         else
             echo "Deleting the existing VDI file..."
-            rm "$vdi_file"
+            VBoxManage closemedium disk --filename "$vdi_file" --delete
         fi
     fi
     echo "No Virtual Disk Image found. Creating a new one..."
-    VBoxManage createhd --filename "$vdi_file" --size 12000
+    VBoxManage createmedium disk --filename "$vdi_file" --size 12000 --format=VDI
 }
 
 # MAIN
