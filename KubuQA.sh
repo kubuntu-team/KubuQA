@@ -30,43 +30,38 @@ check_and_install_tool() {
 
 # Function to check for a previous Kubuntu Test VM
 check_existing_vm(){
-
-# Run VBoxManage list vms and capture output
-vms_output=$(VBoxManage list vms)
-
-# Check for "TestKubuntuInstall" Virtual Machine
-vm_id=$(echo "$vms_output" | grep "\"TestKubuntuInstall\"" | awk '{print $2}' | tr -d '{}')
-
-if [ -n "$vm_id" ]; then
-    # Prompt the user with kdialog
-    response=$(kdialog --title "VM Exists" --yesno "The 'TestKubuntuInstall' VM exists (ID: $vm_id). Do you want to keep it?")
-
-    # Check the user's decision from kdialog's return status
-    if [ $? -eq 0 ]; then
-        # User chose to keep the VM
-        echo "Keeping 'TestKubuntuInstall' VM."
-    else
-        # User chose to remove the VM
-        VBoxManage unregistervm "$vm_id" --delete
-        echo "'TestKubuntuInstall' VM has been removed."
+    # Run VBoxManage list vms and capture output
+    vms_output=$(VBoxManage list vms)
+    # Check for "TestKubuntuInstall" Virtual Machine
+    vm_id=$(echo "$vms_output" | grep "\"TestKubuntuInstall\"" | awk '{print $2}' | tr -d '{}')
+    if [ -n "$vm_id" ]; then
+        # Prompt the user with kdialog
+        response=$(kdialog --title "VM Exists" --yesno "The 'TestKubuntuInstall' VM exists (ID: $vm_id). Do you want to keep it?")
+        # Check the user's decision from kdialog's return status
+        if [ $? -eq 0 ]; then
+            # User chose to keep the VM
+            echo "Keeping 'TestKubuntuInstall' VM."
+        else
+            # User chose to remove the VM
+            VBoxManage unregistervm "$vm_id" --delete
+            echo "'TestKubuntuInstall' VM has been removed."
+        fi
     fi
-fi
 
-# Check for existing Hard Drive
-if [ -f "$vdi_file" ]; then
-  if kdialog --yesno "Existing HDD disk-drive found. Keep it?"; then
-    echo "User chose to keep the existing file."
-  else
-    echo "Deleting the existing VDI file..."
-    rm "$vdi_file"
-  fi
-else
-  echo "VDI file doesn't exist. Creating a new one..."
-  VBoxManage createhd --filename "$vdi_file" --size 12000
-fielse
-    echo "'TestKubuntuInstall' VM does not exist. Initialising..."
-fi
-
+    # Check for existing Hard Drive
+    if [ -f "$vdi_file" ]; then
+        if kdialog --yesno "Existing HDD disk-drive found. Keep it?"; then
+            echo "User chose to keep the existing file."
+        else
+            echo "Deleting the existing VDI file..."
+            rm "$vdi_file"
+        fi
+    else
+        echo "VDI file doesn't exist. Creating a new one..."
+        VBoxManage createhd --filename "$vdi_file" --size 12000
+    fielse
+        echo "'TestKubuntuInstall' VM does not exist. Initialising..."
+    fi
 }
 
 # MAIN
