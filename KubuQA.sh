@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC1090
 
 # This script automates downloading the latest daily ISO for Kubuntu and spinning up a VM in VirtualBox.
 # It uses VBoxManage to set up the VM, look here for documentation: https://www.virtualbox.org/manual/ch08.html
@@ -130,7 +131,7 @@ function check_existing_vdi() {
 function check_existing_iso() {
     # Ensure the ISO Download directory exists
     mkdir -p "$ISO_DOWNLOAD_DIR"
-    cd "$ISO_DOWNLOAD_DIR"
+    cd "$ISO_DOWNLOAD_DIR" || kdialog --error "There is something wrong with the ISO Download directory. Make sure it is accessible."
     # Check if the ISO file exists, and has already been downloaded
     if [ -f "$ISO_FILENAME" ]; then
         # Prompt the user to check for updates
