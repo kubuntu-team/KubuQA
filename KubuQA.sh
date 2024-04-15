@@ -7,7 +7,7 @@
 # -------------
 
 # If you want to configure things (e.g. Download directory, location of the VDI), please edit the variables below.
-# You can also use flags to set these variables.
+# You can also use flags or specify a config file via the '--config' flag. See './KubuQA.sh --help' for details.
 
 # Directory the ISO file will be downloaded to.
 # Default: "$HOME/Downloads/KubuntuTestISO"
@@ -62,12 +62,14 @@ usage() {
     echo "Usage: ./KubuQA.sh [OPTIONS]"
     echo ""
     echo "Options:"
+    echo "  --config <path>             Path to a config file to source. If more command line options follow, they will overwrite the setting in the config file."
     echo "  -c, --cpu <cores>           Number of virtual CPUs to assign to the VM. Default: 2"
     echo "  -i, --iso-dir <directory>   Directory to download the ISO file. Default: \"$HOME/Downloads/KubuntuTestISO\""
     echo "  -n, --vm-name <name>        Name of the Virtual Machine. Default: \"TestKubuntuInstall\""
     echo "  -v, --vdi-path <path>       Path to the Virtual Disk Image (VDI). Default: \"$HOME/VirtualBox VMs/<vm-name>/<vm-name>.vdi\""
     echo "  -r, --ram <MB>              Amount of host system RAM to allocate to the VM (in MB). Default: 2048 (2 GB)"
     echo "  -p, --paravirt <provider>   Enable paravirtualization via KVM for better performance. Possible values: \"kvm\", \"none\". Default: \"none\""
+    echo "  -h, --help              Display this help message and exit"
 }
 
 
@@ -161,6 +163,12 @@ check_and_install_tool VBoxManage virtualbox
 # TODO Validate the input
 while [[ "$#" -gt 0 ]]; do
     case $1 in
+        --config)        if source "$2"; then
+                             echo "Sourcing \"$2\""
+                         else
+                             kdialog --warningcontinuecancel "The config file \"$2\" was not found. Continue with the default values?"
+                         fi
+                         shift;;
         -c | --cpu)      VM_CPU_CORES="$2"
                          shift ;;
         -i | --iso-dir)  ISO_DOWNLOAD_DIR="$2"
@@ -173,6 +181,8 @@ while [[ "$#" -gt 0 ]]; do
                          shift ;;
         -p | --paravirt) PARAVIRT="$2"
                          shift ;;
+        -h | --help)     usage
+                         exit ;;
         *)               echo "Unknown flag: $1"
                          usage
                          exit 1;;
