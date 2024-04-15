@@ -44,7 +44,6 @@ PARAVIRT="none"
 #############################################
 
 ISO_FILENAME="noble-desktop-amd64.iso"
-ISO_FILEPATH="$ISO_DOWNLOAD_DIR/$ISO_FILENAME"
 
 # Don't include the protocol http:// || https:// as we need to switch between them
 # to enable zsync to be succesful. See:
@@ -204,7 +203,7 @@ if kdialog --yesno "Launch a Test Install using Virtual Box?"; then
     case "$choice" in
            # Attatch the ISO to its storage controller and make VirtualBox boot from it
         1) VBoxManage modifyvm "$VM_NAME" --boot1 dvd
-           VBoxManage storageattach "$VM_NAME" --storagectl "IDE Controller" --port 0 --device 0 --type dvddrive --medium "$ISO_FILEPATH" ;;
+           VBoxManage storageattach "$VM_NAME" --storagectl "IDE Controller" --port 0 --device 0 --type dvddrive --medium "$ISO_DOWNLOAD_DIR/$ISO_FILENAME" ;;
            # Make VirtualBox boot from the VDI
         2) VBoxManage modifyvm "$VM_NAME" --boot1 disk ;;
         *) echo "Invalid choice"; exit 1 ;;
