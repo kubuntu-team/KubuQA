@@ -6,19 +6,71 @@
 # CONFIGURATION
 # -------------
 
-# Define the directory and file names
-directory="$HOME/Downloads/KubuntuTestISO"
-isoFileName="noble-desktop-amd64.iso"
-isoFilePath="$directory/$isoFileName"
-vdi_file="$HOME/VirtualBox VMs/TestKubuntuInstall/TestKubuntuInstall.vdi"
+# If you want to configure things (e.g. Download directory, location of the VDI), please edit the variables below.
+# You can also use flags or specify a config file via the '--config' flag. See './KubuQA.sh --help' for details.
+
+# Directory the ISO file will be downloaded to.
+# Default: "$HOME/Downloads/KubuntuTestISO"
+ISO_DOWNLOAD_DIR="$HOME/Downloads/KubuntuTestISO"
+
+# Name of the VM.
+# Default: "TestKubuntuInstall"
+VM_NAME="TestKubuntuInstall"
+
+# Path to the Virtual Disk Image (VDI). The image will be created if it doesn't exist.
+# Default: "$HOME/VirtualBox VMs/$VM_NAME/$VM_NAME.vdi"
+VDI_FILEPATH="$HOME/VirtualBox VMs/$VM_NAME/$VM_NAME.vdi"
+
+# Number of virtual CPUs to assign to the VM.
+# You should not configure virtual machines to use more CPU cores than are available physically.
+# Rule of thumb: Assign about 1/4-1/2 of your physical cores,
+# depending on what you are doing on the host system aside from running the VM.
+# Default: 2
+VM_CPU_CORES="2"
+
+# The amount of host system RAM to allocate to the VM (in MB).
+# The more, the better for the VM, but keep in mind what you are doing on the host system aside from running the VM.
+# Default: 2048 (aka 2 GB)
+VM_RAM="2048"
+
+# Wheter to enable paravirtualization via KVM. This leads to better performance on devices that support it.
+# Possible values: "kvm" (to enable), "none" (to diable)
+# Default: "none"
+PARAVIRT="none"
+
+
+#############################################
+# DO NOT EDIT ANY VARIABLES BELOW THIS LINE #
+#############################################
+
+ISO_FILENAME="noble-desktop-amd64.iso"
 
 # Don't include the protocol http:// || https:// as we need to switch between them
 # to enable zsync to be succesful. See:
 # https://ubuntuforums.org/showthread.php?t=2494264
-isoDownloadURL="cdimages.ubuntu.com/kubuntu/daily-live/current/$isoFileName"
+ISO_DOWNLOAD_URL="cdimages.ubuntu.com/kubuntu/daily-live/current/$ISO_FILENAME"
 
 # FUNCTIONS
 # ---------
+
+# Print a help message
+usage() {
+    echo "This script automates downloading the latest daily ISO for Kubuntu and spinning up a VM in VirtualBox."
+    echo "It sets up the VM using VBoxManage. For more details, see: https://github.com/kubuntu-team/KubuQA/blob/main/README.md"
+    echo ""
+    echo "Usage: ./KubuQA.sh [OPTIONS]"
+    echo ""
+    echo "Options:"
+    echo "  --config <path>             Path to a config file to source. If more command line options follow, they will overwrite the setting in the config file."
+    echo "  -c, --cpu <cores>           Number of virtual CPUs to assign to the VM. Default: 2"
+    echo "  -i, --iso-dir <directory>   Directory to download the ISO file. Default: \"$HOME/Downloads/KubuntuTestISO\""
+    echo "  -n, --vm-name <name>        Name of the Virtual Machine. Default: \"TestKubuntuInstall\""
+    echo "  -v, --vdi-path <path>       Path to the Virtual Disk Image (VDI). Default: \"$HOME/VirtualBox VMs/<vm-name>/<vm-name>.vdi\""
+    echo "  -r, --ram <MB>              Amount of host system RAM to allocate to the VM (in MB). Default: 2048 (2 GB)"
+    echo "  -p, --paravirt <provider>   Enable paravirtualization via KVM for better performance. Possible values: \"kvm\", \"none\". Default: \"none\""
+    echo "  -h, --help              Display this help message and exit"
+}
+
 
 # Function to check and install required tools & dependencies
 check_and_install_tool() {
@@ -35,60 +87,62 @@ check_and_install_tool() {
 check_existing_vm(){
     # Run VBoxManage list vms and capture output
     vms_output=$(VBoxManage list vms)
-    # Check for "TestKubuntuInstall" Virtual Machine
-    vm_id=$(echo "$vms_output" | grep "\"TestKubuntuInstall\"" | awk '{print $2}' | tr -d '{}')
+    # Check for "$VM_NAME" Virtual Machine
+    vm_id=$(echo "$vms_output" | grep "\"$VM_NAME\"" | awk '{print $2}' | tr -d '{}')
     if [ -n "$vm_id" ]; then
         # Prompt the user with kdialog
-        if kdialog --title "VM Exists" --yesno "The 'TestKubuntuInstall' VM exists (ID: $vm_id). Do you want to keep it?"; then
+        if kdialog --title "VM Exists" --yesno "The '$VM_NAME' VM exists (ID: $vm_id). Do you want to keep it?"; then
             # User chose to keep the VM
-            echo "Keeping 'TestKubuntuInstall' VM."
+            echo "Keeping '$VM_NAME' VM."
             return
         else
             # User chose to remove the VM
             VBoxManage unregistervm "$vm_id" --delete
-            echo "'TestKubuntuInstall' VM has been removed."
+            echo "'$VM_NAME' VM has been removed."
         fi
     fi
     # There was no VM or the user chose to remove it
-    VBoxManage createvm --name "TestKubuntuInstall" --register
+    VBoxManage createvm --name "$VM_NAME" --register
+    # Set up the newly created VM
+    VBoxManage modifyvm "$VM_NAME" --os-type="Ubuntu_64" --acpi on --nic1 nat --cpus="$VM_CPU_CORES" --memory="$VM_RAM" --paravirt-provider="$PARAVIRT"
     # Create storage controllers for the ISO and VDI
-    VBoxManage storagectl "TestKubuntuInstall" --name "SATA Controller" --add sata --bootable=on
-    VBoxManage storagectl "TestKubuntuInstall" --name "IDE Controller" --add ide --bootable=on
-    echo "A new 'TestKubuntuInstall' VM has been created."
+    VBoxManage storagectl "$VM_NAME" --name "SATA Controller" --add sata --bootable=on
+    VBoxManage storagectl "$VM_NAME" --name "IDE Controller" --add ide --bootable=on
+    echo "A new '$VM_NAME' VM has been created."
 }
 
 # Function to check for existing Virtual Disk Image. If not found, create one.
 function check_existing_vdi() {
     # Check if there is already a registered VDI in VirtualBox
-    if VBoxManage list hdds | grep --quiet "TestKubuntuInstall"; then
+    if VBoxManage list hdds | grep --quiet "$VM_NAME"; then
         if kdialog --yesno "Existing Virtual Disk Image (VDI) found. Keep it?"; then
             echo "User chose to keep the existing VDI file."
             return
         else
             echo "Deleting the existing VDI file..."
-            VBoxManage closemedium disk "$vdi_file" --delete
+            VBoxManage closemedium disk "$VDI_FILEPATH" --delete
         fi
     fi
     echo "No Virtual Disk Image found. Creating a new one..."
-    VBoxManage createmedium disk --filename "$vdi_file" --size 12000 --format=VDI
+    VBoxManage createmedium disk --filename "$VDI_FILEPATH" --size 12000 --format=VDI
 }
 
 function check_existing_iso() {
     # Ensure the ISO Download directory exists
-    mkdir -p "$directory"
-    cd "$directory"
+    mkdir -p "$ISO_DOWNLOAD_DIR"
+    cd "$ISO_DOWNLOAD_DIR"
     # Check if the ISO file exists, and has already been downloaded
-    if [ -f "$isoFileName" ]; then
+    if [ -f "$ISO_FILENAME" ]; then
         # Prompt the user to check for updates
         if kdialog --yesno "I found an ISO Test Image, would you like to check for updates?"; then
             # Use zsync to update the ISO
-            zsync "http://$isoDownloadURL.zsync"
+            zsync "http://$ISO_DOWNLOAD_URL.zsync"
         fi
     else
         # Prompt the user to download the ISO if it doesn't exist
         if kdialog --yesno "No local test ISO image available, should I download one?"; then
             # Download the ISO
-            wget "https://$isoDownloadURL"
+            wget "https://$ISO_DOWNLOAD_URL"
         else
             exit
         fi
@@ -104,6 +158,37 @@ check_and_install_tool zsync zsync
 check_and_install_tool wget wget
 check_and_install_tool VBoxManage virtualbox
 
+# Parse command line arguments
+# TODO Validate the input
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --config)        if source "$2"; then
+                             echo "Sourcing \"$2\""
+                         else
+                             kdialog --warningcontinuecancel "The config file \"$2\" was not found. Continue with the default values?"
+                         fi
+                         shift;;
+        -c | --cpu)      VM_CPU_CORES="$2"
+                         shift ;;
+        -i | --iso-dir)  ISO_DOWNLOAD_DIR="$2"
+                         shift ;;
+        -n | --vm-name)  VM_NAME="$2"
+                         shift ;;
+        -v | --vdi-path) VDI_FILEPATH="$2"
+                         shift ;;
+        -r | --ram)      VM_RAM="$2"
+                         shift ;;
+        -p | --paravirt) PARAVIRT="$2"
+                         shift ;;
+        -h | --help)     usage
+                         exit ;;
+        *)               echo "Unknown flag: $1"
+                         usage
+                         exit 1;;
+    esac
+    shift
+done
+
 # Check whether various components exist. If not or if requested, (re)create them
 check_existing_vm
 check_existing_vdi
@@ -116,19 +201,19 @@ if kdialog --yesno "Launch a Test Install using Virtual Box?"; then
     choice=$(kdialog --menu "Select boot medium" 1 "ISO" 2 "VDI")
 
     case "$choice" in
-           # Connect the ISO to its storage controller and make VirtualBox boot from it
-        1) VBoxManage modifyvm "TestKubuntuInstall" --memory 2048 --acpi on --boot1 dvd --nic1 nat
-           VBoxManage storageattach "TestKubuntuInstall" --storagectl "IDE Controller" --port 0 --device 0 --type dvddrive --medium "$isoFilePath" ;;
+           # Attatch the ISO to its storage controller and make VirtualBox boot from it
+        1) VBoxManage modifyvm "$VM_NAME" --boot1 dvd
+           VBoxManage storageattach "$VM_NAME" --storagectl "IDE Controller" --port 0 --device 0 --type dvddrive --medium "$ISO_DOWNLOAD_DIR/$ISO_FILENAME" ;;
            # Make VirtualBox boot from the VDI
-        2) VBoxManage modifyvm "TestKubuntuInstall" --memory 2048 --acpi on --boot1 disk --nic1 nat ;;
+        2) VBoxManage modifyvm "$VM_NAME" --boot1 disk ;;
         *) echo "Invalid choice"; exit 1 ;;
     esac
 
     # Connect the VDI to its storage controller
-    VBoxManage storageattach "TestKubuntuInstall" --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium "$vdi_file"
+    VBoxManage storageattach "$VM_NAME" --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium "$VDI_FILEPATH"
 
     # Spin it up, we are Go For Launch!!
-    VBoxManage startvm "TestKubuntuInstall"
+    VBoxManage startvm "$VM_NAME"
 else
     exit
 fi
