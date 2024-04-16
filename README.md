@@ -87,10 +87,10 @@ or open a Pull Request on our [Github KubuQA](https://github.com/kubuntu-team/Ku
 
 ### Ideas (so far)
 
-- [ ] Introductory dialog that gives an overview of what is about to happen
-- [ ] Implement various variables to make the script more configurable and accessible
-  - [ ] Make sure to validate the input
-- [ ] Provide an "Uninstall" option
+- [ ] [Introductory dialog that gives an overview of what is about to happen](https://github.com/kubuntu-team/KubuQA/issues/7)
+- [ ] [Implement various variables to make the script more configurable and accessible](https://github.com/kubuntu-team/KubuQA/issues/8)
+- [ ] [Make sure to validate the input](https://github.com/kubuntu-team/KubuQA/issues/9)
+- [ ] [Provide an "Uninstall" option](https://github.com/kubuntu-team/KubuQA/issues/10)
 
 ## License
 
