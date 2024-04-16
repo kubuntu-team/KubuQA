@@ -85,6 +85,8 @@ Be prepared to authenticate as necessary.
 If you have ideas for additions or improvements please do create an Issue,
 or open a Pull Request on our [Github KubuQA](https://github.com/kubuntu-team/KubuQA).
 
+Please make sure your code contribution passes [Shellcheck](https://github.com/koalaman/shellcheck), to ensure good code quality.
+
 ### Ideas (so far)
 
 - [ ] [Introductory dialog that gives an overview of what is about to happen](https://github.com/kubuntu-team/KubuQA/issues/7)
