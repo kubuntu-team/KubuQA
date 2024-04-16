@@ -53,7 +53,7 @@ chmod +x KubuQA.sh
 
 ### Usage
 
-To run the script, simply execute it from the terminal:
+To run the script with default settings, execute it from the terminal like this:
 
 ```bash
 ./KubuQA.sh
@@ -64,7 +64,7 @@ The script will guide you through the following steps:
 - Install all necessary programs it needs to run (see above)
 - Set up the scaffold of the testing VM if necessary
 - Create a Virtual Disk Image (VDI) if necessary
-- Look for a KubuntuTestISO directory in your Downloads directory and create it if necessary
+- Look for the specified ISO download directory (`~/Downloads/KubuntuTestISO` by default) and create it if necessary
 - Check if the `noble-desktop-amd64.iso` file exists within this directory:
   - If found, offer to check for updates using zsync.
   - If not found, prompt to download the ISO.
@@ -76,6 +76,22 @@ since the VDI is empty and can't be used as boot device as long as there is no O
 Upon subsequent runs, you may choose to boot from ISO or VDI, giving you the ability to Stop/Start your testing as desired.
 
 For each of the steps that require user interaction, a `kdialog` prompt will appear to guide you through the process.
+
+### Configuration
+
+KubuQA aims to be usable by anyone, the goal is to provide an easy way to get started in the testing and development of Kubuntu.
+Following the KDE motto "Simple by default, powerful when needed", it comes with sane defaults and multiple configuration options.
+
+You can set these variables either by directly editing the script, providing a config file (see the
+[sample config file](./KubuQA.conf) for reference), or passing flags when executing the script.
+
+For an overview of all configuration options, run
+
+```bash
+./KubuQA.sh --help
+```
+
+Keep in mind that when the same variable is being set multiple times (e.g. in a config file and as a flag in the same command), only the last value will be processed.
 
 ## Contributing
 
