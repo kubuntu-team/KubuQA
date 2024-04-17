@@ -68,7 +68,7 @@ usage() {
     echo "  -v, --vdi-path <path>       Path to the Virtual Disk Image (VDI). Default: \"$HOME/VirtualBox VMs/<vm-name>/<vm-name>.vdi\""
     echo "  -r, --ram <MB>              Amount of host system RAM to allocate to the VM (in MB). Default: 2048 (2 GB)"
     echo "  -p, --paravirt <provider>   Enable paravirtualization via KVM for better performance. Possible values: \"kvm\", \"none\". Default: \"none\""
-    echo "  -h, --help              Display this help message and exit"
+    echo "  -h, --help                  Display this help message and exit"
 }
 
 
