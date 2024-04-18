@@ -34,7 +34,13 @@ VM_CPU_CORES="2"
 # Default: 2048 (aka 2 GB)
 VM_RAM="2048"
 
-# Wheter to enable paravirtualization via KVM. This leads to better performance on devices that support it.
+# The amount of host system RAM to allocate to the Video Framebuffer
+# Range (8 - 128)mb
+# Default is 64mb
+# More video RAM may enable higher resolution display (See VirtualBox Guest Additions for Full Video Support)
+VIDEO_RAM="64"
+
+# Whether to enable paravirtualization via KVM. This leads to better performance on devices that support it.
 # Possible values: "kvm" (to enable), "none" (to diable)
 # Default: "none"
 PARAVIRT="none"
@@ -104,8 +110,26 @@ check_existing_vm(){
     fi
     # There was no VM or the user chose to remove it
     VBoxManage createvm --name "$VM_NAME" --register
+
     # Set up the newly created VM
-    VBoxManage modifyvm "$VM_NAME" --os-type="Ubuntu_64" --acpi on --nic1 nat --cpus="$VM_CPU_CORES" --memory="$VM_RAM" --paravirt-provider="$PARAVIRT"
+    # Command parameters differ between VBoxManage v6 and v7 Doh!
+    # https://www.virtualbox.org/manual/ch08.html#vboxmanage-modifyvm
+    # Find VBoxManage version
+    vbox_version=$(VBoxManage --version | cut -d 'r' -f 1 | cut -d '.' -f 1)
+
+    # Define Base command
+    base_cmd="VBoxManage modifyvm \"$VM_NAME\" --acpi on --nic1 nat --cpus=\"$VM_CPU_CORES\" --memory=\"$VM_RAM\" --vram=\"$VIDEO_RAM\""
+
+    # Check version and call the command with the correct parameters
+    if (( $vbox_version < 7 )); then
+        # Version 6
+        eval $base_cmd --ostype=\"Ubuntu \(64-bit\)\" --paravirtprovider=\"$PARAVIRT\"
+    else
+        # Version 7 or higher
+        eval $base_cmd --os-type=\"Ubuntu_64\" --paravirt-provider=\"$PARAVIRT\"
+    fi
+
+    #VBoxManage modifyvm "$VM_NAME" --ostype="Ubuntu (64-bit)" --acpi on --nic1 nat --cpus="$VM_CPU_CORES" --memory="$VM_RAM" --paravirtprovider="$PARAVIRT"
     # Create storage controllers for the ISO and VDI
     VBoxManage storagectl "$VM_NAME" --name "SATA Controller" --add sata --bootable=on
     VBoxManage storagectl "$VM_NAME" --name "IDE Controller" --add ide --bootable=on
@@ -215,6 +239,14 @@ if kdialog --yesno "Launch a Test Install using Virtual Box?"; then
 
     # Spin it up, we are Go For Launch!!
     VBoxManage startvm "$VM_NAME"
+
+    # Wait 10 seconds and then resize the display
+    # This ensures that as the installer runs the Calamares Slide show renders nicely, and the user
+    # has enough screen realestate to operate the installer.
+    sleep 10
+    VBoxManage setextradata global GUI/MaxGuestResolution any
+    VBoxManage setextradata "$VM_NAME" "CustomVideoMode1" "1366x768x32"
+    VBoxManage controlvm "$VM_NAME" setvideomodehint 1366 768 32
 else
     exit
 fi
