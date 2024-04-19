@@ -123,10 +123,10 @@ check_existing_vm(){
     # Check version and call the command with the correct parameters
     if [ "$vbox_version" -lt 7 ]; then
         # Version 6
-        eval "$base_cmd" --ostype=\"Ubuntu \(64-bit\)\" --paravirtprovider=\"$PARAVIRT\"
+        eval "$base_cmd" --ostype="Ubuntu (64-bit)" --paravirtprovider="$PARAVIRT"
     else
         # Version 7 or higher
-        eval "$base_cmd" --os-type=\"Ubuntu_64\" --paravirt-provider=\"$PARAVIRT\"
+        eval "$base_cmd" --os-type="Ubuntu_64" --paravirt-provider="$PARAVIRT"
     fi
 
     #VBoxManage modifyvm "$VM_NAME" --ostype="Ubuntu (64-bit)" --acpi on --nic1 nat --cpus="$VM_CPU_CORES" --memory="$VM_RAM" --paravirtprovider="$PARAVIRT"
