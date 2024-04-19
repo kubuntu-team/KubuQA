@@ -121,12 +121,12 @@ check_existing_vm(){
     base_cmd="VBoxManage modifyvm \"$VM_NAME\" --acpi on --nic1 nat --cpus=\"$VM_CPU_CORES\" --memory=\"$VM_RAM\" --vram=\"$VIDEO_RAM\""
 
     # Check version and call the command with the correct parameters
-    if (( $vbox_version < 7 )); then
+    if [ "$vbox_version" -lt 7 ]; then
         # Version 6
-        eval $base_cmd --ostype=\"Ubuntu \(64-bit\)\" --paravirtprovider=\"$PARAVIRT\"
+        eval "$base_cmd" --ostype=\"Ubuntu \(64-bit\)\" --paravirtprovider=\"$PARAVIRT\"
     else
         # Version 7 or higher
-        eval $base_cmd --os-type=\"Ubuntu_64\" --paravirt-provider=\"$PARAVIRT\"
+        eval "$base_cmd" --os-type=\"Ubuntu_64\" --paravirt-provider=\"$PARAVIRT\"
     fi
 
     #VBoxManage modifyvm "$VM_NAME" --ostype="Ubuntu (64-bit)" --acpi on --nic1 nat --cpus="$VM_CPU_CORES" --memory="$VM_RAM" --paravirtprovider="$PARAVIRT"
@@ -243,6 +243,8 @@ if kdialog --yesno "Launch a Test Install using Virtual Box?"; then
     # Wait 10 seconds and then resize the display
     # This ensures that as the installer runs the Calamares Slide show renders nicely, and the user
     # has enough screen realestate to operate the installer.
+    # Hat Tip to 'Sergey Tkachenko' https://winaero.com/author/hb860root/
+    # https://winaero.com/set-exact-display-resolution-in-virtualbox-virtual-machine/
     sleep 10
     VBoxManage setextradata global GUI/MaxGuestResolution any
     VBoxManage setextradata "$VM_NAME" "CustomVideoMode1" "1366x768x32"
