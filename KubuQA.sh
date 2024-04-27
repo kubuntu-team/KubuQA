@@ -11,7 +11,7 @@
 # You can also use flags or specify a config file via the '--config' flag. See './KubuQA.sh --help' for details.
 
 # Directory the ISO file will be downloaded to.
-# Default: "$HOME/Downloads/KubuntuTestISO"
+# Default is a XDG download dir, i.e. for English locale: "$HOME/Downloads/KubuntuTestISO"
 ISO_DOWNLOAD_DIR="$(xdg-user-dir DOWNLOAD)/KubuntuTestISO"
 
 # Name of the VM.
