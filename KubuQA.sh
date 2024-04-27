@@ -12,7 +12,7 @@
 
 # Directory the ISO file will be downloaded to.
 # Default: "$HOME/Downloads/KubuntuTestISO"
-ISO_DOWNLOAD_DIR="$HOME/Downloads/KubuntuTestISO"
+ISO_DOWNLOAD_DIR="$(xdg-user-dir DOWNLOAD)/KubuntuTestISO"
 
 # Name of the VM.
 # Default: "TestKubuntuInstall"
@@ -70,7 +70,7 @@ usage() {
     echo "Options:"
     echo "  --config <path>             Path to a config file to source. If more command line options follow, they will overwrite the setting in the config file."
     echo "  -c, --cpu <cores>           Number of virtual CPUs to assign to the VM. Default: 2"
-    echo "  -i, --iso-dir <directory>   Directory to download the ISO file. Default: \"$HOME/Downloads/KubuntuTestISO\""
+    echo "  -i, --iso-dir <directory>   Directory to download the ISO file. Default: \"$(xdg-user-dir DOWNLOAD)/KubuntuTestISO\""
     echo "  -n, --vm-name <name>        Name of the Virtual Machine. Default: \"TestKubuntuInstall\""
     echo "  -v, --vdi-path <path>       Path to the Virtual Disk Image (VDI). Default: \"$HOME/VirtualBox VMs/<vm-name>/<vm-name>.vdi\""
     echo "  -r, --ram <MB>              Amount of host system RAM to allocate to the VM (in MB). Default: 2048 (2 GB)"
