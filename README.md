@@ -2,11 +2,11 @@
 
 ## Kubuntu ISO Testing Utility - Spin up VMs with ease
 
-**New to Kubuntu Testing & Development ?** No worries, we have you covered!!
+**New to Ubuntu Testing & Development ?** No worries, we have got you covered!!
 
 ### Overview
 
-This Bash script automates the process of setting up a test environment based off the latest daily build of Kubuntu.
+This Bash script automates the process of setting up a test environment based upon Ubuntu CD images.
 It downloads all required files if necessary and facilitates launching a test installation using VirtualBox.
 It leverages `kdialog` for graphical user interaction,
 making it accessible even for users who prefer not to work with the command line directly.
@@ -64,22 +64,22 @@ The script will guide you through the following steps:
 - Install all necessary programs it needs to run (see above)
 - Set up the scaffold of the testing VM if necessary
 - Create a Virtual Disk Image (VDI) if necessary
-- Look for the specified ISO download directory (`~/Downloads/KubuntuTestISO` by default) and create it if necessary
-- Check if the `noble-desktop-amd64.iso` file exists within this directory:
+- Look for the specified ISO download directory (`~/Downloads/KubuQATestISOfiles` by default) and create it if necessary
+- Check if the flavor ISO file exists within this directory:
   - If found, offer to check for updates using zsync.
   - If not found, prompt to download the ISO.
 - Ask if you want to launch a test installation in VirtualBox.
 If you choose Yes, a new VirtualBox VM will be started.
-Please **make sure to select `ISO`** when starting up a freshly created VM,
+Please **make sure to select `ISO cdimage`** when starting up a freshly created VM,
 since the VDI is empty and can't be used as boot device as long as there is no OS installed on it.
 
-Upon subsequent runs, you may choose to boot from ISO or VDI, giving you the ability to Stop/Start your testing as desired.
+Upon subsequent runs, you may choose to boot from 'ISO cdimage' or 'VDI disk', giving you the ability to Stop/Start your testing as desired.
 
 For each of the steps that require user interaction, a `kdialog` prompt will appear to guide you through the process.
 
 ### Configuration
 
-KubuQA aims to be usable by anyone, the goal is to provide an easy way to get started in the testing and development of Kubuntu.
+KubuQA aims to be usable by anyone, the goal is to provide an easy way to get started in the testing and development of Ubuntu.
 Following the KDE motto "Simple by default, powerful when needed", it comes with sane defaults and multiple configuration options.
 
 You can set these variables either by directly editing the script, providing a config file (see the
