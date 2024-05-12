@@ -12,15 +12,7 @@
 
 # Directory the ISO file will be downloaded to.
 # Default is a XDG download dir, i.e. for English locale: "$HOME/Downloads/KubuntuTestISO"
-ISO_DOWNLOAD_DIR="$(xdg-user-dir DOWNLOAD)/KubuntuTestISO"
-
-# Name of the VM.
-# Default: "TestKubuntuInstall"
-VM_NAME="TestKubuntuInstall"
-
-# Path to the Virtual Disk Image (VDI). The image will be created if it doesn't exist.
-# Default: "$HOME/VirtualBox VMs/$VM_NAME/$VM_NAME.vdi"
-VDI_FILEPATH="$HOME/VirtualBox VMs/$VM_NAME/$VM_NAME.vdi"
+ISO_DOWNLOAD_DIR="$(xdg-user-dir DOWNLOAD)/KubuQATestISOfiles"
 
 # Number of virtual CPUs to assign to the VM.
 # You should not configure virtual machines to use more CPU cores than are available physically.
@@ -50,12 +42,7 @@ PARAVIRT="none"
 # DO NOT EDIT ANY VARIABLES BELOW THIS LINE #
 #############################################
 
-ISO_FILENAME="noble-desktop-amd64.iso"
 
-# Don't include the protocol http:// || https:// as we need to switch between them
-# to enable zsync to be succesful. See:
-# https://ubuntuforums.org/showthread.php?t=2494264
-ISO_DOWNLOAD_URL="cdimages.ubuntu.com/kubuntu/daily-live/current/$ISO_FILENAME"
 
 # FUNCTIONS
 # ---------
@@ -90,7 +77,7 @@ check_and_install_tool() {
     fi
 }
 
-# Function to check for a previous Kubuntu Test VM. If not found, create one.
+# Function to check for a previous KubuQA test VM. If not found, create one.
 check_existing_vm(){
     # Run VBoxManage list vms and capture output
     vms_output=$(VBoxManage list vms)
@@ -175,6 +162,46 @@ function check_existing_iso() {
     fi
 }
 
+# Enable the user to choose which Ubuntu Flavor they want to test
+function choose_flavor() {
+    # See: https://cdimage.ubuntu.com/ for flavors and path info etc...
+    choice=$(kdialog --menu "Select Ubuntu Flavor" 1 "Ubuntu" 2 "Kubuntu" 3 "Lubuntu" 4 "Ubuntu-Budgie" 5 "Edubuntu" 6 "Ubuntu-Unity" 7 "Ubuntu-Cinnamon")
+    case $choice in
+          1) FLAVOR="ubuntu"
+             VM_NAME="KubuQATestUbuntu";;
+          2) FLAVOR="kubuntu"
+             VM_NAME="KubuQATestKubuntu";;
+          3) FLAVOR="lubuntu"
+             VM_NAME="KubuQATestLubuntu";;
+          4) FLAVOR="ubuntu-budgie"
+             VM_NAME="KubuQATestUbuntuBudgie";;
+          5) FLAVOR="edubuntu"
+             VM_NAME="KubuQATestEdubuntu";;
+          6) FLAVOR="ubuntu-unity"
+             VM_NAME="KubuQATestUbuntuUnity";;
+          7) FLAVOR="ubuntucinnamon"
+             VM_NAME="KubuQATestUbuntuCinnamon";;
+    esac
+
+    release=$(kdialog --menu "Which version " 1 "Noble Numbat 24.04" 2 "Oracular Oriole 24.10")
+    case $release in
+          1) ISO_FILENAME="noble-desktop-amd64.iso";;
+          2) ISO_FILENAME="oracular-desktop-amd64.iso";;
+    esac
+
+# Don't include the protocol http:// || https:// as we need to switch between them
+# to enable zsync to be successful. See:
+# https://ubuntuforums.org/showthread.php?t=2494264
+ISO_DOWNLOAD_URL="cdimages.ubuntu.com/$FLAVOR/daily-live/current/$ISO_FILENAME"
+
+#Each Flavor should have it's own download director
+ISO_DOWNLOAD_DIR="$ISO_DOWNLOAD_DIR/$FLAVOR"
+
+# Path to the Virtual Disk Image (VDI). The image will be created if it doesn't exist.
+# Default: "$HOME/VirtualBox VMs/$VM_NAME/$VM_NAME.vdi"
+VDI_FILEPATH="$HOME/VirtualBox VMs/$VM_NAME/$VM_NAME.vdi"
+
+}
 # MAIN
 # ----
 
@@ -215,7 +242,8 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-# Check whether various components exist. If not or if requested, (re)create them
+# Check whether various components exist. If not or if requested, (re)create
+choose_flavor
 check_existing_vm
 check_existing_vdi
 check_existing_iso
@@ -224,7 +252,7 @@ check_existing_iso
 if kdialog --yesno "Launch a Test Install using Virtual Box?"; then
 
     # Enable the user to choose which device to boot from
-    choice=$(kdialog --menu "Select boot medium" 1 "ISO" 2 "VDI")
+    choice=$(kdialog --menu "Select boot medium" 1 "ISO cdimage" 2 "VDI disk")
 
     case "$choice" in
            # Attatch the ISO to its storage controller and make VirtualBox boot from it
@@ -243,7 +271,7 @@ if kdialog --yesno "Launch a Test Install using Virtual Box?"; then
 
     # Wait 10 seconds and then resize the display
     # This ensures that as the installer runs the Calamares Slide show renders nicely, and the user
-    # has enough screen realestate to operate the installer.
+    # has enough screen real estate to operate the installer.
     # Hat Tip to 'Sergey Tkachenko' https://winaero.com/author/hb860root/
     # https://winaero.com/set-exact-display-resolution-in-virtualbox-virtual-machine/
     sleep 10
