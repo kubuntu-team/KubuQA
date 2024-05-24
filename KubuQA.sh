@@ -37,6 +37,58 @@ VIDEO_RAM="64"
 # Default: "none"
 PARAVIRT="none"
 
+# Ubuntu Main and Flavor ISO Configurations
+# -----------------------------------------
+#   Provide path to CD image for the flavors ISO's
+#   Use full download path & filename
+#   Don't include the protocol http:// || https:// as we need to switch between them
+#   to enable zsync to be successful. See:
+#   https://ubuntuforums.org/showthread.php?t=2494264
+#
+#
+# Current Relese: server_path/filename
+# <FLAVOR>_RELEASE="releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso"
+
+# Daily Build: server_path/filename
+# <FLAVOR>_DAILY="cdimages.ubuntu.com/ubuntu/daily-live/current/oracular-desktop-amd64.iso"
+
+# UBUNTU
+UBUNTU_RELEASE="releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso"
+UBUNTU_DAILY="cdimages.ubuntu.com/ubuntu/daily-live/current/oracular-desktop-amd64.iso"
+
+# KUBUNTU
+KUBUNTU_RELEASE="cdimage.ubuntu.com/kubuntu/releases/24.04/release/kubuntu-24.04-desktop-amd64.iso"
+KUBUNTU_DAILY="cdimages.ubuntu.com/kubuntu/daily-live/current/oracular-desktop-amd64.iso"
+
+# LUBUNTU
+LUBUNTU_RELEASE="cdimages.ubuntu.com/lubuntu/releases/24.04/release/lubuntu-24.04-desktop-amd64.iso"
+LUBUNTU_DAILY="cdimages.ubuntu.com/lubuntu/daily-live/current/oracular-desktop-amd64.iso"
+
+# UBUNTU BUDGIE
+BUDGIE_RELEASE="cdimages.ubuntu.com/ubuntu-budgie/releases/24.04/release/ubuntu-budgie-24.04-desktop-amd64.iso"
+BUDGIE_DAILY="cdimages.ubuntu.com/ubuntu-budgie/daily-live/current/oracular-desktop-amd64.iso"
+
+# EDUBUNTU
+EDUBUNTU_RELEASE="cdimages.ubuntu.com/edubuntu/releases/24.04/release/edubuntu-24.04-desktop-amd64.iso"
+EDUBUNTU_DAILY="cdimages.ubuntu.com/edubuntu/daily-live/current/oracular-desktop-amd64.iso"
+
+# UBUNTU UNITY
+UNITY_RELEASE="cdimages.ubuntu.com/ubuntu-unity/releases/24.04/release/ubuntu-unity-24.04-desktop-amd64.iso"
+UNITY_DAILY="cdimages.ubuntu.com/ubuntu-unity/daily-live/current/oracular-desktop-amd64.iso"
+
+# UBUNTU CINNAMON
+CINNAMON_RELEASE="cdimages.ubuntu.com/ubuntucinnamon/releases/noble/release/ubuntucinnamon-24.04-desktop-amd64.iso"
+CINNAMON_DAILY="cdimages.ubuntu.com/ubuntucinnamon/daily-live/current/oracular-desktop-amd64.iso"
+
+# UBUNTU STUDIO
+STUDIO_RELEASE="cdimages.ubuntu.com/ubuntustudio/releases/24.04/release/ubuntustudio-24.04-dvd-amd64.iso"
+# Note: There doesn't seem to build a daily build for Ubuntu Studio, so using current release
+STUDIO_DAILY="cdimages.ubuntu.com/ubuntustudio/releases/24.04/release/ubuntustudio-24.04-dvd-amd64.iso"
+
+# XUBUNTU
+XUBUNTU_RELEASE="cdimages.ubuntu.com/xubuntu/releases/24.04/release/xubuntu-24.04-desktop-amd64.iso"
+XUBUNTU_DAILY="cdimages.ubuntu.com/xubuntu/daily-live/current/oracular-desktop-amd64.iso"
+
 
 #############################################
 # DO NOT EDIT ANY VARIABLES BELOW THIS LINE #
@@ -143,8 +195,10 @@ function check_existing_vdi() {
 function check_existing_iso() {
     # Ensure the ISO Download directory exists
     mkdir -p "$ISO_DOWNLOAD_DIR"
+    echo "$ISO_DOWNLOAD_DIR"
     cd "$ISO_DOWNLOAD_DIR" || kdialog --error "There is something wrong with the ISO Download directory. Make sure it is accessible."
     # Check if the ISO file exists, and has already been downloaded
+    echo "Looking for $ISO_FILENAME"
     if [ -f "$ISO_FILENAME" ]; then
         # Prompt the user to check for updates
         if kdialog --yesno "I found an ISO Test Image, would you like to check for updates?"; then
@@ -165,36 +219,75 @@ function check_existing_iso() {
 # Enable the user to choose which Ubuntu Flavor they want to test
 function choose_flavor() {
     # See: https://cdimage.ubuntu.com/ for flavors and path info etc...
-    choice=$(kdialog --menu "Select Ubuntu Flavor" 1 "Ubuntu" 2 "Kubuntu" 3 "Lubuntu" 4 "Ubuntu-Budgie" 5 "Edubuntu" 6 "Ubuntu-Unity" 7 "Ubuntu-Cinnamon")
+    choice=$(kdialog --menu "Select Ubuntu Flavor" 1 "Ubuntu" 2 "Kubuntu" 3 "Lubuntu" 4 "Ubuntu-Budgie" 5 "Edubuntu" 6 "Ubuntu-Unity" 7 "Ubuntu-Cinnamon" 8 "Ubuntu-Studio" 9 "Xubuntu")
     case $choice in
+
+          # UBUNTU
           1) FLAVOR="ubuntu"
-             VM_NAME="KubuQATestUbuntu";;
+             VM_NAME="KubuQATestUbuntu"
+             RELEASE="$UBUNTU_RELEASE"
+             DAILY="$UBUNTU_DAILY";;
+
+          # KUBUNTU
           2) FLAVOR="kubuntu"
-             VM_NAME="KubuQATestKubuntu";;
+             VM_NAME="KubuQATestKubuntu"
+             RELEASE="$KUBUNTU_RELEASE"
+             DAILY="$KUBUNTU_DAILY";;
+
+          # LUBUNTU
           3) FLAVOR="lubuntu"
-             VM_NAME="KubuQATestLubuntu";;
+             VM_NAME="KubuQATestLubuntu"
+             RELEASE="$LUBUNTU_RELEASE"
+             DAILY="$LUBUNTU_DAILY";;
+
+          # UBUNTU BUDGIE
           4) FLAVOR="ubuntu-budgie"
-             VM_NAME="KubuQATestUbuntuBudgie";;
+             VM_NAME="KubuQATestUbuntuBudgie"
+             RELEASE="$BUDGIE_RELEASE"
+             DAILY="$BUDGIE_DAILY";;
+
+          # EDUBUNTU
           5) FLAVOR="edubuntu"
-             VM_NAME="KubuQATestEdubuntu";;
+             VM_NAME="KubuQATestEdubuntu"
+             RELEASE="$EDUBUNTU_RELEASE"
+             DAILY="$EDUBUNTU_DAILY";;
+
+          # UBUNTU UNITY
           6) FLAVOR="ubuntu-unity"
-             VM_NAME="KubuQATestUbuntuUnity";;
+             VM_NAME="KubuQATestUbuntuUnity"
+             RELEASE="$UNITY_RELEASE"
+             DAILY="$UNITY_DAILY";;
+
+          # UBUNTU CINNAMON
           7) FLAVOR="ubuntucinnamon"
-             VM_NAME="KubuQATestUbuntuCinnamon";;
+             VM_NAME="KubuQATestUbuntuCinnamon"
+             RELEASE="$CINNAMON_RELEASE"
+             DAILY="$CINNAMON_DAILY";;
+
+          # UBUNTU STUDIO
+          8) FLAVOR="ubuntustudio"
+             VM_NAME="KubuQATestUbuntuStudio"
+             RELEASE="$STUDIO_RELEASE"
+             DAILY="$STUDIO_DAILY";;
+
+          # XUBUNTU
+          9) FLAVOR="xubuntu"
+             VM_NAME="KubuQATestXubuntu"
+             RELEASE="$XUBUNTU_RELEASE"
+             DAILY="$XUBUNTU_DAILY";;
     esac
 
-    release=$(kdialog --menu "Which version " 1 "Noble Numbat 24.04" 2 "Oracular Oriole 24.10")
+    release=$(kdialog --menu "Which version " 1 "Current Release" 2 "Daily Build")
     case $release in
-          1) ISO_FILENAME="noble-desktop-amd64.iso";;
-          2) ISO_FILENAME="oracular-desktop-amd64.iso";;
+          1) ISO_DOWNLOAD_URL="$RELEASE";;
+
+          2) ISO_DOWNLOAD_URL="$DAILY";;
     esac
 
-# Don't include the protocol http:// || https:// as we need to switch between them
-# to enable zsync to be successful. See:
-# https://ubuntuforums.org/showthread.php?t=2494264
-ISO_DOWNLOAD_URL="cdimages.ubuntu.com/$FLAVOR/daily-live/current/$ISO_FILENAME"
+# Extract ISO filename to Check / Update, and used by VBox manage to mount the ISO
+ISO_FILENAME=$(echo "$ISO_DOWNLOAD_URL" | sed 's/^.*\///')
 
-#Each Flavor should have it's own download director
+#Each Flavor should have it's own download directory
 ISO_DOWNLOAD_DIR="$ISO_DOWNLOAD_DIR/$FLAVOR"
 
 # Path to the Virtual Disk Image (VDI). The image will be created if it doesn't exist.
