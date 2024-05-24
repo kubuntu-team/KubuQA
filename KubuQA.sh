@@ -202,11 +202,8 @@ function check_existing_iso() {
     if [ -f "$ISO_FILENAME" ]; then
         # Prompt the user to check for updates
         if kdialog --yesno "I found an ISO Test Image, would you like to check for updates?"; then
-            # Only apply to daily builds and not releases
-            if [ DAILY_ISO ]; then
             # Use zsync to update the ISO
             zsync "http://$ISO_DOWNLOAD_URL.zsync"
-            fi
         fi
     else
         # Prompt the user to download the ISO if it doesn't exist
@@ -241,7 +238,7 @@ function choose_flavor() {
           3) FLAVOR="lubuntu"
              VM_NAME="KubuQATestLubuntu"
              RELEASE="$LUBUNTU_RELEASE"
-             DAILY="$LUBUNTU_RELEASE";;
+             DAILY="$LUBUNTU_DAILY";;
 
           # UBUNTU BUDGIE
           4) FLAVOR="ubuntu-budgie"
