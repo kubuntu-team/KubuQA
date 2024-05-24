@@ -285,7 +285,7 @@ function choose_flavor() {
     esac
 
 # Extract ISO filename to Check / Update, and used by VBox manage to mount the ISO
-ISO_FILENAME=$(echo $ISO_DOWNLOAD_URL | sed 's/^.*\///')
+ISO_FILENAME=$(echo "$ISO_DOWNLOAD_URL" | sed 's/^.*\///')
 
 #Each Flavor should have it's own download directory
 ISO_DOWNLOAD_DIR="$ISO_DOWNLOAD_DIR/$FLAVOR"
