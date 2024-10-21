@@ -57,7 +57,7 @@ UBUNTU_RELEASE="releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso"
 UBUNTU_DAILY="cdimages.ubuntu.com/ubuntu/daily-live/current/oracular-desktop-amd64.iso"
 
 # KUBUNTU
-KUBUNTU_RELEASE="cdimage.ubuntu.com/kubuntu/releases/24.04/release/kubuntu-24.04-desktop-amd64.iso"
+KUBUNTU_RELEASE="cdimage.ubuntu.com/kubuntu/releases/24.10/release/kubuntu-24.10-desktop-amd64.iso"
 KUBUNTU_DAILY="cdimages.ubuntu.com/kubuntu/daily-live/current/oracular-desktop-amd64.iso"
 
 # LUBUNTU
