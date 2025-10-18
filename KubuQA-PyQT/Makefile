@@ -4,7 +4,7 @@ VENV_DIR := .venv
 PIP := $(VENV_DIR)/bin/pip
 PYTHON_BIN := $(VENV_DIR)/bin/python
 
-.PHONY: install clean build package run
+.PHONY: install clean build package run test
 
 install: $(PYTHON_BIN)
 	@$(PIP) install --upgrade pip --no-cache-dir
@@ -44,3 +44,9 @@ run: install
 	else \
 		echo "Entry point app.py not found. Please create it before running."; \
 	fi
+
+test: install
+	@if [ ! -x $(VENV_DIR)/bin/pytest ]; then \
+		$(PIP) install --no-cache-dir pytest; \
+	fi
+	@$(VENV_DIR)/bin/pytest -q

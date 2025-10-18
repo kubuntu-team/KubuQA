@@ -16,6 +16,11 @@ dependencies = [
   "PyQt6>=6.6,<7.0"
 ]
 
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.4,<8.0"
+]
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["kubuqa*"]
