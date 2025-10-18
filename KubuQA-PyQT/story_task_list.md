@@ -1,6 +1,6 @@
 # EPIC: Project Bootstrap & Infrastructure
-- [ ] Initialize `KubuQA-PyQT` package structure with entry point and module layout
-- [ ] Configure packaging/dependency metadata (pyproject, requirements)
+- [x] Initialize `KubuQA-PyQT` package structure with entry point and module layout
+- [x] Configure packaging/dependency metadata (pyproject, requirements)
 - [ ] Set up logging, configuration loading, and application-wide constants
 - [ ] Implement foundational unit test harness and CI hooks
 

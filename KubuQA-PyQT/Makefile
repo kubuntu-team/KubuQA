@@ -7,10 +7,15 @@ PYTHON_BIN := $(VENV_DIR)/bin/python
 .PHONY: install clean build package run test
 
 install: $(PYTHON_BIN)
-	@$(PIP) install --upgrade pip --no-cache-dir
-	@if [ -f requirements.txt ]; then \
-		$(PIP) install --no-cache-dir -r requirements.txt; \
+	@if [ ! -d $(VENV_DIR) ]; then \
+		echo "Creating virtual environment at $(VENV_DIR)"; \
+		$(PYTHON) -m venv $(VENV_DIR); \
 	fi
+	@. $(VENV_DIR)/bin/activate && \
+		python -m pip install --upgrade pip --no-cache-dir && \
+		{ if [ -f requirements.txt ]; then \
+			python -m pip install --no-cache-dir -r requirements.txt; \
+		fi; }
 
 $(PYTHON_BIN):
 	@$(PYTHON) -m venv $(VENV_DIR)
