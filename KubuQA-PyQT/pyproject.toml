@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kubuqa-pyqt"
+version = "0.1.0"
+description = "PyQt desktop application for managing Kubuntu QA workflows."
+authors = [
+  { name = "KubuQA Team" }
+]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "PyQt6>=6.6,<7.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["kubuqa*"]
