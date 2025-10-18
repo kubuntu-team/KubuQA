@@ -33,3 +33,9 @@
 - [ ] Document developer setup and contribution guidelines
 - [ ] Add user-facing help and troubleshooting content
 - [ ] Pilot release packaging and smoke test instructions
+
+# EPIC: PyInstaller Packaging
+- [ ] Evaluate PyInstaller project structure and entry point definition
+- [ ] Create PyInstaller spec/build configuration for desktop application
+- [ ] Automate PyInstaller packaging and artifact verification
+- [ ] Document packaging workflow and distribution checklist
