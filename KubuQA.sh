@@ -32,6 +32,17 @@ VM_RAM="2048"
 # More video RAM may enable higher resolution display (See VirtualBox Guest Additions for Full Video Support)
 VIDEO_RAM="64"
 
+# Size of the Virtual Disk Image (VDI) in MB
+# Default: 12000 (approx. 12 GB)
+VM_VDI_SIZE="12000"
+
+# Guest display settings for the VirtualBox VM
+# These values are used to configure the initial display resolution and colour depth.
+# Default resolution: 1366x768 with 32 bit colour depth
+VM_DISPLAY_WIDTH="1366"
+VM_DISPLAY_HEIGHT="768"
+VM_DISPLAY_COLOR_DEPTH="32"
+
 # Whether to enable paravirtualization via KVM. This leads to better performance on devices that support it.
 # Possible values: "kvm" (to enable), "none" (to diable)
 # Default: "none"
@@ -223,7 +234,7 @@ function check_existing_vdi() {
         fi
     fi
     echo "No Virtual Disk Image found. Creating a new one..."
-    VBoxManage createmedium disk --filename "$VDI_FILEPATH" --size 12000 --format=VDI
+    VBoxManage createmedium disk --filename "$VDI_FILEPATH" --size "$VM_VDI_SIZE" --format=VDI
 }
 
 function check_existing_iso() {
@@ -362,6 +373,13 @@ validate_settings() {
         exit 1
     fi
 
+    # Validate VDI size
+    if ! validate_integer "$VM_VDI_SIZE"; then
+        kdialog --error "The VDI size must be a positive integer (in MB). You provided: \"$VM_VDI_SIZE\""
+        echo "The VDI size must be a positive integer (in MB). You provided: \"$VM_VDI_SIZE\""
+        exit 1
+    fi
+
     # Validate ISO download directory
     if [ -n "$ISO_DOWNLOAD_DIR" ] && [ -e "$ISO_DOWNLOAD_DIR" ] && [ ! -d "$ISO_DOWNLOAD_DIR" ]; then
         kdialog --error "The ISO download path exists but is not a directory: \"$ISO_DOWNLOAD_DIR\""
@@ -379,6 +397,25 @@ validate_settings() {
             exit 1
             ;;
     esac
+
+    # Validate display settings
+    if ! validate_integer "$VM_DISPLAY_WIDTH"; then
+        kdialog --error "The display width must be a positive integer. You provided: \"$VM_DISPLAY_WIDTH\""
+        echo "The display width must be a positive integer. You provided: \"$VM_DISPLAY_WIDTH\""
+        exit 1
+    fi
+
+    if ! validate_integer "$VM_DISPLAY_HEIGHT"; then
+        kdialog --error "The display height must be a positive integer. You provided: \"$VM_DISPLAY_HEIGHT\""
+        echo "The display height must be a positive integer. You provided: \"$VM_DISPLAY_HEIGHT\""
+        exit 1
+    fi
+
+    if ! validate_integer "$VM_DISPLAY_COLOR_DEPTH"; then
+        kdialog --error "The display colour depth must be a positive integer. You provided: \"$VM_DISPLAY_COLOR_DEPTH\""
+        echo "The display colour depth must be a positive integer. You provided: \"$VM_DISPLAY_COLOR_DEPTH\""
+        exit 1
+    fi
 }
 # MAIN
 # ----
@@ -456,8 +493,8 @@ if kdialog --yesno "Launch a Test Install using Virtual Box?"; then
     # https://winaero.com/set-exact-display-resolution-in-virtualbox-virtual-machine/
     sleep 10
     VBoxManage setextradata global GUI/MaxGuestResolution any
-    VBoxManage setextradata "$VM_NAME" "CustomVideoMode1" "1366x768x32"
-    VBoxManage controlvm "$VM_NAME" setvideomodehint 1366 768 32
+    VBoxManage setextradata "$VM_NAME" "CustomVideoMode1" "${VM_DISPLAY_WIDTH}x${VM_DISPLAY_HEIGHT}x${VM_DISPLAY_COLOR_DEPTH}"
+    VBoxManage controlvm "$VM_NAME" setvideomodehint "$VM_DISPLAY_WIDTH" "$VM_DISPLAY_HEIGHT" "$VM_DISPLAY_COLOR_DEPTH"
 else
     exit
 fi
