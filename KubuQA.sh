@@ -32,6 +32,10 @@ VM_RAM="2048"
 # More video RAM may enable higher resolution display (See VirtualBox Guest Additions for Full Video Support)
 VIDEO_RAM="64"
 
+# Prefix used for naming Virtual Machines created by KubuQA.
+# This is used to identify KubuQA created VMs when listing and uninstalling them.
+KUBUQA_VM_PREFIX="KubuQATest"
+
 # Whether to enable paravirtualization via KVM. This leads to better performance on devices that support it.
 # Possible values: "kvm" (to enable), "none" (to diable)
 # Default: "none"
@@ -148,6 +152,9 @@ usage() {
     echo "  -v, --vdi-path <path>       Path to the Virtual Disk Image (VDI). Default: \"$HOME/VirtualBox VMs/<vm-name>/<vm-name>.vdi\""
     echo "  -r, --ram <MB>              Amount of host system RAM to allocate to the VM (in MB). Default: 2048 (2 GB)"
     echo "  -p, --paravirt <provider>   Enable paravirtualization via KVM for better performance. Possible values: \"kvm\", \"none\". Default: \"none\""
+    echo "      --list                  List all Virtual Machines created by KubuQA and exit"
+    echo "      --remove [vm-name]      Remove a Virtual Machine created by KubuQA. If no name is provided, a selection dialog will be shown."
+    echo "      --purge                 Remove all Virtual Machines created by KubuQA after confirmation"
     echo "  -h, --help                  Display this help message and exit"
 }
 
@@ -380,6 +387,141 @@ validate_settings() {
             ;;
     esac
 }
+
+# Return a list of VM names created by KubuQA
+get_kubuqa_vms() {
+    VBoxManage list vms | awk -F'"' -v prefix="$KUBUQA_VM_PREFIX" '$2 ~ "^" prefix { print $2 }'
+}
+
+# List all VM's created by KubuQA
+list_kubuqa_vms() {
+    local vms
+
+    vms=$(get_kubuqa_vms)
+
+    if [ -z "$vms" ]; then
+        echo "No Virtual Machines created by KubuQA were found."
+        return 0
+    fi
+
+    echo "Virtual Machines created by KubuQA:"
+    echo ""
+    echo "$vms"
+}
+
+# Remove a single KubuQA created VM (and its VDI)
+remove_kubuqa_vm() {
+    local vm_name="$1"
+    local known_vms
+    local vm_id
+
+    if [ -z "$vm_name" ]; then
+        echo "No Virtual Machine name provided."
+        exit 1
+    fi
+
+    known_vms=$(get_kubuqa_vms)
+
+    if ! printf '%s\n' "$known_vms" | grep -qx "$vm_name"; then
+        kdialog --error "The Virtual Machine \"$vm_name\" is not recognised as being created by KubuQA."
+        echo "The Virtual Machine \"$vm_name\" is not recognised as being created by KubuQA."
+        exit 1
+    fi
+
+    # Confirm removal with the user
+    if ! kdialog --yesno "You are about to uninstall the Virtual Machine \"$vm_name\".\n\nThis will permanently delete the VM, its Virtual Disk Image (VDI) and associated storage controllers.\n\nDo you want to continue?"; then
+        echo "Uninstall of \"$vm_name\" was cancelled by the user."
+        exit 0
+    fi
+
+    # Try to obtain the VM ID
+    vm_id=$(VBoxManage list vms | grep "\"$vm_name\"" | awk '{print $2}' | tr -d '{}')
+
+    # Attempt to power off the VM if it is running
+    if VBoxManage showvminfo "$vm_name" --machinereadable | grep -q '^VMState="running"'; then
+        VBoxManage controlvm "$vm_name" poweroff
+    fi
+
+    # Unregister and delete the VM (including its disks)
+    if [ -n "$vm_id" ]; then
+        VBoxManage unregistervm "$vm_id" --delete
+    else
+        VBoxManage unregistervm "$vm_name" --delete
+    fi
+
+    echo "The Virtual Machine \"$vm_name\" has been uninstalled."
+}
+
+# Interactively uninstall a KubuQA created VM via kdialog
+interactive_uninstall_vm() {
+    local vms
+    local menu_items
+    local index
+    local choice
+    local selected_vm
+
+    vms=$(get_kubuqa_vms)
+
+    if [ -z "$vms" ]; then
+        kdialog --msgbox "No Virtual Machines created by KubuQA were found."
+        echo "No Virtual Machines created by KubuQA were found."
+        return 0
+    fi
+
+    index=1
+    menu_items=""
+    while IFS= read -r vm; do
+        menu_items="$menu_items $index \"$vm\""
+        index=$((index + 1))
+    done <<EOF
+$vms
+EOF
+
+    # shellcheck disable=SC2086
+    choice=$(eval "kdialog --menu \"Select a KubuQA Virtual Machine to uninstall\" $menu_items") || return 0
+
+    index=1
+    while IFS= read -r vm; do
+        if [ "$index" -eq "$choice" ]; then
+            selected_vm="$vm"
+            break
+        fi
+        index=$((index + 1))
+    done <<EOF
+$vms
+EOF
+
+    if [ -n "$selected_vm" ]; then
+        remove_kubuqa_vm "$selected_vm"
+    fi
+}
+
+# Remove all KubuQA created VMs after confirmation
+purge_kubuqa_vms() {
+    local vms
+
+    vms=$(get_kubuqa_vms)
+
+    if [ -z "$vms" ]; then
+        kdialog --msgbox "No Virtual Machines created by KubuQA were found."
+        echo "No Virtual Machines created by KubuQA were found."
+        return 0
+    fi
+
+    if ! kdialog --yesno "You are about to uninstall all Virtual Machines created by KubuQA.\n\nThe following VMs will be permanently deleted:\n\n$vms\n\nThis will remove each VM, its Virtual Disk Image (VDI) and associated storage controllers.\n\nDo you want to continue?"; then
+        echo "Purge of KubuQA created Virtual Machines was cancelled by the user."
+        return 0
+    fi
+
+    while IFS= read -r vm; do
+        if [ -n "$vm" ]; then
+            echo "Uninstalling \"$vm\""
+            remove_kubuqa_vm "$vm"
+        fi
+    done <<EOF
+$vms
+EOF
+}
 # MAIN
 # ----
 
@@ -411,6 +553,17 @@ while [[ "$#" -gt 0 ]]; do
                          shift ;;
         -p | --paravirt) PARAVIRT="$2"
                          shift ;;
+        --list)          list_kubuqa_vms
+                         exit ;;
+        --remove)        if [ -n "$2" ] && [ "${2#-}" = "$2" ]; then
+                             remove_kubuqa_vm "$2"
+                             shift
+                         else
+                             interactive_uninstall_vm
+                         fi
+                         exit ;;
+        --purge)         purge_kubuqa_vms
+                         exit ;;
         -h | --help)     usage
                          exit ;;
         *)               echo "Unknown flag: $1"
